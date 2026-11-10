@@ -1,6 +1,0 @@
-{
-  "appId": "bd.pubali.depositcalculator",
-  "appName": "Pubali Deposit Calculator",
-  "webDir": "www",
-  "android": { "allowMixedContent": false }
-}
