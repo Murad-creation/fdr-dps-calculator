@@ -49,9 +49,12 @@ const en = {
   sTbsdTenures: 'TBSD tenure options (months, comma separated)', sReset: 'Reset to defaults', sSaved: 'Saved on this device',
   sDpsCm: 'DPS interest capitalisation', sDpsDc: 'DPS day count', sFdrCm: 'FDR default compounding', sFdrDc: 'FDR day count', sTbsdDc: 'TBSD day count', sExBasis: 'Excise duty balance basis',
   sConfirmReset: 'Reset all settings to defaults?',
+  // v3 additions
+  version: 'Version', build: 'Build', sAbout: 'About this app', appSubtitle: 'See what you will actually receive after tax and duty',
+  legPrincipal: 'Principal', legInterest: 'Net interest', legDeduction: 'Deductions', taxShort: 'Tax',
   // v2 additions
   fdrTerm: 'FDR Term (sets the interest rate)', totalYears: 'Total Tenure - Years', totalExtraMonths: 'Total Tenure - Extra Months',
-  totalTenureHint: 'How long the FDR stays invested in total. It renews automatically at the end of each term (e.g. 1-year term with 5 years total = 5 renewals).',
+  totalTenureHint: 'How long the FDR stays invested in total. It renews automatically at the end of each term (e.g. a 3-month term with 3 years total = 12 terms).',
   terms: 'Number of Terms',
   tbsdManualYears: 'Or type tenure in years (manual)', tbsdManualHint: 'Minimum 6 months, no maximum. Fractions allowed (2.5 years = 30 months). Overrides the month buttons above.',
   netInterestCredited: 'Total Net Interest Credited (after tax)', finalPayable: 'Final Payable at Maturity (after excise)',
@@ -106,9 +109,12 @@ const bn = {
   sTbsdTenures: 'টিবিএসডি মেয়াদের বিকল্প (মাস, কমা দিয়ে)', sReset: 'ডিফল্টে ফিরুন', sSaved: 'এই ডিভাইসে সংরক্ষিত',
   sDpsCm: 'ডিপিএস সুদ যুক্ত হওয়ার ব্যবধান', sDpsDc: 'ডিপিএস দিন গণনা', sFdrCm: 'এফডিআর ডিফল্ট চক্রবৃদ্ধি', sFdrDc: 'এফডিআর দিন গণনা', sTbsdDc: 'টিবিএসডি দিন গণনা', sExBasis: 'আবগারি শুল্কের স্থিতির ভিত্তি',
   sConfirmReset: 'সব সেটিংস ডিফল্টে ফিরিয়ে নেবেন?',
+  // v3 additions
+  version: 'সংস্করণ', build: 'বিল্ড', sAbout: 'অ্যাপ সম্পর্কে', appSubtitle: 'কর ও শুল্ক কাটার পর আসলে কত পাবেন, দেখুন',
+  legPrincipal: 'আসল', legInterest: 'নিট সুদ', legDeduction: 'কর্তন', taxShort: 'কর',
   // v2 additions
   fdrTerm: 'এফডিআর মেয়াদ (এটি সুদের হার ঠিক করে)', totalYears: 'মোট মেয়াদ - বছর', totalExtraMonths: 'মোট মেয়াদ - অতিরিক্ত মাস',
-  totalTenureHint: 'এফডিআর মোট কত সময় থাকবে। প্রতিটি মেয়াদ শেষে নিজে থেকেই নবায়ন হবে (যেমন ১ বছরের মেয়াদ ও মোট ৫ বছর = ৫ বার)।',
+  totalTenureHint: 'এফডিআর মোট কত সময় থাকবে। প্রতিটি মেয়াদ শেষে নিজে থেকেই নবায়ন হবে (যেমন ৩ মাসের মেয়াদ ও মোট ৩ বছর = ১২টি মেয়াদ)।',
   terms: 'মেয়াদের সংখ্যা',
   tbsdManualYears: 'অথবা মেয়াদ বছরে লিখুন (ম্যানুয়াল)', tbsdManualHint: 'সর্বনিম্ন ৬ মাস, সর্বোচ্চ সীমা নেই। ভগ্নাংশ চলবে (২.৫ বছর = ৩০ মাস)। উপরের মাসের বোতামের চেয়ে এটি অগ্রাধিকার পাবে।',
   netInterestCredited: 'মোট নিট সুদ জমা (কর কাটার পর)', finalPayable: 'মেয়াদপূর্তিতে চূড়ান্ত প্রদেয় (শুল্ক কর্তনের পর)',

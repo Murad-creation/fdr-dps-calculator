@@ -3,6 +3,7 @@ import { calculate } from './engine/index.js';
 import { PRODUCTS } from './products.js';
 import { t, getLang, setLang } from './i18n.js';
 import { fmtMoney, fmtDate, fmtInt, localizeDigits, esc } from './format.js';
+import { APP_VERSION, BUILD_ID, BUILD_DATE } from './version.js';
 
 const app = document.getElementById('app');
 const $ = (s, r = document) => r.querySelector(s);
@@ -84,14 +85,16 @@ const exciseCols = () => [
 const errorsHtml = (errs) => `<div class="card err"><ul>${errs.map((e) => `<li>${esc(t(`err_${e}`))}</li>`).join('')}</ul></div>`;
 
 /* ---------------- Home ---------------- */
+const verLine = () => `${t('version')} ${APP_VERSION} · ${t('build')} ${BUILD_ID} · ${BUILD_DATE}`;
 function viewHome() {
-  const tile = (href, icon, label, sub, id) => `<${id ? 'button type="button" id="' + id + '"' : 'a href="' + href + '"'} class="tile">${ICONS[icon]}<span>${esc(label)}</span>${sub ? `<small>${esc(sub)}</small>` : ''}</${id ? 'button' : 'a'}>`;
-  return `<div class="hero"><div class="seal">★</div><div class="brand"><div class="bn">পূবালী ব্যাংক পিএলসি</div><div class="en">PUBALI BANK PLC</div></div></div>
-  <div class="userbar"><div class="avatar">${ICONS.user}</div><div class="uname">${esc(t('appTitle'))}</div></div>
-  <main class="sheet"><div class="grid">
-    ${tile('#/dps', 'dps', t('dps'), t('dpsFull'))}${tile('#/fdr', 'fdr', t('fdr'), t('fdrFull'))}
-    ${tile('#/tbsd', 'tbsd', t('tbsd'), t('tbsdFull'))}${tile(`#/details/${last || 'dps'}`, 'details', t('lastResult'))}
-  </div>${estNote()}</main>${nav('home')}`;
+  const tile = (href, icon, label, sub, cls = '') => `<a href="${href}" class="tile ${cls}"><span class="ico">${ICONS[icon]}</span><span class="tt">${esc(label)}</span>${sub ? `<small>${esc(sub)}</small>` : ''}</a>`;
+  return `<div class="hero"><i class="orb o1"></i><i class="orb o2"></i><div class="seal">★</div><div class="brand"><div class="bn">পূবালী ব্যাংক পিএলসি</div><div class="en">PUBALI BANK PLC</div></div></div>
+  <main class="home">
+    <section class="welcome"><div class="avatar">${ICONS.user}</div><div><h2>${esc(t('appTitle'))}</h2><p>${esc(t('appSubtitle'))}</p></div></section>
+    <div class="grid">
+      ${tile('#/dps', 'dps', t('dps'), t('dpsFull'), 'dps')}${tile('#/fdr', 'fdr', t('fdr'), t('fdrFull'), 'fdr')}
+      ${tile('#/tbsd', 'tbsd', t('tbsd'), t('tbsdFull'), 'tbsd')}${tile(`#/details/${last || 'dps'}`, 'details', t('lastResult'), '', 'alt')}
+    </div>${estNote()}<p class="ver">${esc(verLine())}</p></main>${nav('home')}`;
 }
 
 /* ---------------- Calculator ---------------- */
@@ -114,6 +117,13 @@ function fieldsHtml(p) {
   }).join('');
 }
 
+function splitBar(s) {
+  const ded = Math.max(0, s.totalDeductions), kept = Math.max(0, s.takeHome);
+  const pr = Math.min(s.principal, kept), intr = kept - pr, total = ded + kept || 1;
+  const w = (x) => ((x / total) * 100).toFixed(2);
+  return `<div class="split" role="img"><i class="sp" style="width:${w(pr)}%"></i><i class="si" style="width:${w(intr)}%"></i><i class="sd" style="width:${w(ded)}%"></i></div>
+  <div class="legend"><span><i class="sp"></i>${t('legPrincipal')}</span><span><i class="si"></i>${t('legInterest')}</span><span><i class="sd"></i>${t('legDeduction')}</span></div>`;
+}
 function resultCard(p, r) {
   const s = r.summary;
   const rows = [
@@ -124,10 +134,12 @@ function resultCard(p, r) {
   const extra = p === 'tbsd'
     ? `<div class="extra"><div class="row"><span>${t(s.compound ? 'netInterestCredited' : 'netInterestPaid')}</span><b>${M(s.netInterestPaid)}</b></div><div class="row"><span>${t(s.compound ? 'finalPayable' : 'finalPrincipal')}</span><b>${M(s.finalPrincipalPayable)}</b></div><p class="note">${t(s.compound ? 'tbsdNoteCompound' : 'tbsdNote')}</p></div>` : '';
   return `<section class="card result">
+    <div class="take"><span>${t('takeHome')}</span><strong>${M(s.takeHome)}</strong>
+      <div class="chips"><em>${t('maturityDate')}: ${F.d(s.maturityDate)}</em><em>${t('taxShort')} ${localizeDigits(s.taxRatePct, L())}%</em></div></div>
+    ${splitBar(s)}
     <div class="row gross"><span>${t('grossAmount')}</span><b>${M(s.grossAmount)}</b></div>
-    <div class="less">${t('less')}:</div>${rows}
-    <div class="row total"><span>${t('totalDeduction')}</span><b>${M(s.totalDeductions)}</b></div>
-    <div class="take"><span>${t('takeHome')}</span><strong>${M(s.takeHome)}</strong></div>${extra}
+    <div class="less">${t('less')}</div>${rows}
+    <div class="row total"><span>${t('totalDeduction')}</span><b>${M(s.totalDeductions)}</b></div>${extra}
     <a class="btn" href="#/details/${p}">${t('viewDetails')}</a>${estNote()}</section>`;
 }
 
@@ -274,6 +286,7 @@ function viewSettings() {
   const dc = [['monthly', t('dcMonthly')], ['actual', t('dcActual')]];
   const slabs = cfg.excise.slabs.map((s, i) => `<div class="slab"><input data-slab="${i}" data-f="upTo" inputmode="numeric" placeholder="${t('sNoLimit')}" value="${s.upTo ?? ''}"><input data-slab="${i}" data-f="duty" inputmode="numeric" value="${s.duty}"><button type="button" class="x" data-del="${i}" aria-label="remove">×</button></div>`).join('');
   return `${topBar(t('settings'))}<main class="sheet pad">
+  <section class="card about"><h3>${t('sAbout')}</h3><ul class="kv"><li><span>${t('version')}</span><b>${APP_VERSION}</b></li><li><span>${t('build')}</span><b>${esc(BUILD_ID)}</b></li><li><span>${t('colDate')}</span><b>${BUILD_DATE}</b></li></ul></section>
   <section class="card"><h3>${t('sLanguage')}</h3><div class="seg">${[['en', 'langEn'], ['bn', 'langBn']].map(([c, k]) => `<button type="button" class="${L() === c ? 'on' : ''}" data-lang="${c}">${t(k)}</button>`).join('')}</div></section>
   <section class="card"><h3>${t('sRates')}</h3><p class="note">${t('sRatesNote')}</p>
     <h4>${t('dps')}</h4><div class="g3">${[3, 5, 7].map((y) => numInput(`rates.dps.${y}`, `${localizeDigits(y, L())} ${t('years')}`, '%')).join('')}</div>

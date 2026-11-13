@@ -27,10 +27,21 @@ Local build (needs JDK 17 + Android SDK): `npm install && npx cap add android &&
 Known WebView limits: *Print / Save PDF* and *Download CSV* use the browser print/download APIs and may not work inside the
 Android WebView; add Capacitor `Share` + `Filesystem` plugins if you need them in the APK.
 
+## Updating the phone app (why an install may still show the old version)
+
+* The app shows its version in **Settings → About this app** and at the bottom of **Home**
+  (`Version 1.2.0 · Build <run number>-<commit> · date`). `Build dev` means a local run; an APK from GitHub shows e.g. `Build 14-a1b2c3d`.
+  Compare the build number with the run number on the GitHub *Actions* tab to know exactly which run you installed.
+* Earlier APKs were signed with a different random debug key on every GitHub run, so Android refused to install a new APK over the old one
+  and the old app kept running. The workflow now uses the fixed key in `ci/debug.keystore` and raises `versionCode` each run.
+  **Uninstall the old app once**, then install the new APK; every later APK installs over it and keeps your settings.
+* `ci/debug.keystore` is a throw-away *debug* key (password `android`) and is safe to keep in a public repo. It is not a release key.
+
 ## Architecture
 
 ```
 www/js/engine/   pure calculation engine (no DOM): money, dates, tax, excise, dps, fdr, tbsd, shared, index
+www/js/version.js app version / build id (build id stamped by CI)
 www/js/config.js default settings (rates, tax, excise slabs, methods, rounding, limits); stored in localStorage
 www/js/products.js UI definition per product (fields, defaults, tables)
 www/js/app.js, i18n.js, format.js  views, router, EN/BN strings, Bangladeshi number formatting

@@ -28,12 +28,24 @@ jobs:
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+      - name: Stamp build id into the app (shown in Settings and Home)
+        run: |
+          sed -i "s/BUILD_ID = 'dev'/BUILD_ID = '${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}'/" www/js/version.js
+          grep BUILD_ID www/js/version.js
+      - name: Use the fixed debug key so every new APK installs OVER the old one
+        run: |
+          mkdir -p ~/.android
+          cp ci/debug.keystore ~/.android/debug.keystore
       - name: Install dependencies
         run: npm install
       - name: Generate Android project (first run) and sync web assets
         run: |
           [ -d android ] || npx cap add android
           npx cap sync android
+      - name: Raise the Android versionCode on every build (needed for in-place updates)
+        run: |
+          sed -i "s/versionCode 1/versionCode ${GITHUB_RUN_NUMBER}/; s/versionName \"1.0\"/versionName \"1.2.${GITHUB_RUN_NUMBER}\"/" android/app/build.gradle
+          grep -n "versionCode\|versionName" android/app/build.gradle
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon

@@ -7,7 +7,7 @@ const rateOf = (cfg, p, key) => String(cfg.rates[p][key] ?? cfg.rates[p].default
 const taxSeg = () => seg('taxStatus', 'taxStatus', [{ v: 'submitted', lk: 'submitted' }, { v: 'not_submitted', lk: 'notSubmitted' }]);
 const monthsOpt = (n) => (n % 12 === 0
   ? { v: String(n), num: n / 12, sk: n === 12 ? 'year' : 'years' }
-  : { v: String(n), num: n, sk: 'months' });
+  : { v: String(n), num: n, sk: n === 1 ? 'month' : 'months' });
 const blank = (x) => x === undefined || x === null || String(x).trim() === '';
 
 export const PRODUCTS = {
