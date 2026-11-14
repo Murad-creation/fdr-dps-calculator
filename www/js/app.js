@@ -3,7 +3,7 @@ import { calculate } from './engine/index.js';
 import { PRODUCTS } from './products.js';
 import { t, getLang, setLang } from './i18n.js';
 import { fmtMoney, fmtDate, fmtInt, localizeDigits, esc } from './format.js';
-import { APP_VERSION, BUILD_ID, BUILD_DATE } from './version.js';
+import { APP_VERSION } from './version.js';
 
 const app = document.getElementById('app');
 const $ = (s, r = document) => r.querySelector(s);
@@ -14,6 +14,18 @@ const store = (k, v) => { try { localStorage.setItem(k, typeof v === 'string' ? 
 let vals = load(VKEY, {});
 let last = (() => { try { return localStorage.getItem('pbdc.last') || ''; } catch (e) { return ''; } })();
 if (!PRODUCTS[last]) last = '';
+
+/* profile + theme (kept on this device only) */
+const PKEY = 'pbdc.profile.v1';
+let profile = { name: '', designation: '', branch: '', photo: '', ...load(PKEY, {}) };
+const THEMES = ['green', 'blue', 'purple', 'dark'];
+const THEME_COLORS = { green: '#0d7a33', blue: '#12388a', purple: '#43228a', dark: '#0e1814' };
+let theme = (() => { try { return localStorage.getItem('pbdc.theme') || 'green'; } catch (e) { return 'green'; } })();
+if (!THEMES.includes(theme)) theme = 'green';
+function applyTheme() {
+  document.documentElement.dataset.theme = theme;
+  document.querySelector('meta[name=theme-color]')?.setAttribute('content', THEME_COLORS[theme]);
+}
 
 const L = () => getLang();
 const M = (v, sym = true) => fmtMoney(v, L(), { symbol: sym });
@@ -27,15 +39,14 @@ const ensure = (p) => {
 const compute = (p) => calculate(p, PRODUCTS[p].engineInput(ensure(p)), cfg);
 
 /* ---------------- icons ---------------- */
-const G = '#1aa84f', GD = '#0d7a33', OR = '#f6a623';
 const ICONS = {
-  dps: `<svg viewBox="0 0 64 64"><ellipse cx="30" cy="40" rx="19" ry="17" fill="${G}"/><rect x="24" y="14" width="12" height="9" rx="3" fill="${GD}"/><circle cx="46" cy="30" r="11" fill="${OR}"/><text x="46" y="35" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">৳</text></svg>`,
-  fdr: `<svg viewBox="0 0 64 64"><rect x="10" y="8" width="38" height="48" rx="6" fill="${G}"/><rect x="17" y="18" width="22" height="3.5" rx="1.7" fill="#d8f3e2"/><rect x="17" y="27" width="22" height="3.5" rx="1.7" fill="#d8f3e2"/><rect x="17" y="36" width="14" height="3.5" rx="1.7" fill="#d8f3e2"/><circle cx="46" cy="44" r="12" fill="${OR}"/><text x="46" y="50" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">%</text></svg>`,
-  tbsd: `<svg viewBox="0 0 64 64"><rect x="8" y="12" width="40" height="40" rx="6" fill="${G}"/><rect x="8" y="12" width="40" height="11" rx="5" fill="${GD}"/><rect x="16" y="30" width="8" height="6" rx="1.5" fill="#d8f3e2"/><rect x="28" y="30" width="8" height="6" rx="1.5" fill="#d8f3e2"/><rect x="16" y="40" width="8" height="6" rx="1.5" fill="#d8f3e2"/><circle cx="46" cy="42" r="13" fill="${OR}"/><text x="46" y="48" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">৳</text></svg>`,
-  details: `<svg viewBox="0 0 64 64"><rect x="12" y="8" width="40" height="48" rx="6" fill="${G}"/><rect x="20" y="20" width="24" height="4" rx="2" fill="#d8f3e2"/><rect x="20" y="30" width="24" height="4" rx="2" fill="#d8f3e2"/><rect x="20" y="40" width="14" height="4" rx="2" fill="#d8f3e2"/></svg>`,
+  dps: `<svg viewBox="0 0 64 64"><ellipse cx="30" cy="40" rx="19" ry="17" style="fill:var(--g)"/><rect x="24" y="14" width="12" height="9" rx="3" style="fill:var(--gd)"/><circle cx="46" cy="30" r="11" style="fill:var(--or)"/><text x="46" y="35" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">৳</text></svg>`,
+  fdr: `<svg viewBox="0 0 64 64"><rect x="10" y="8" width="38" height="48" rx="6" style="fill:var(--g)"/><rect x="17" y="18" width="22" height="3.5" rx="1.7" fill="#d8f3e2"/><rect x="17" y="27" width="22" height="3.5" rx="1.7" fill="#d8f3e2"/><rect x="17" y="36" width="14" height="3.5" rx="1.7" fill="#d8f3e2"/><circle cx="46" cy="44" r="12" style="fill:var(--or)"/><text x="46" y="50" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">%</text></svg>`,
+  tbsd: `<svg viewBox="0 0 64 64"><rect x="8" y="12" width="40" height="40" rx="6" style="fill:var(--g)"/><rect x="8" y="12" width="40" height="11" rx="5" style="fill:var(--gd)"/><rect x="16" y="30" width="8" height="6" rx="1.5" fill="#d8f3e2"/><rect x="28" y="30" width="8" height="6" rx="1.5" fill="#d8f3e2"/><rect x="16" y="40" width="8" height="6" rx="1.5" fill="#d8f3e2"/><circle cx="46" cy="42" r="13" style="fill:var(--or)"/><text x="46" y="48" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">৳</text></svg>`,
+  details: `<svg viewBox="0 0 64 64"><rect x="12" y="8" width="40" height="48" rx="6" style="fill:var(--g)"/><rect x="20" y="20" width="24" height="4" rx="2" fill="#d8f3e2"/><rect x="20" y="30" width="24" height="4" rx="2" fill="#d8f3e2"/><rect x="20" y="40" width="14" height="4" rx="2" fill="#d8f3e2"/></svg>`,
   settings: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="18" fill="none" stroke="#9aa3ad" stroke-width="9" stroke-dasharray="7 7.07"/><circle cx="32" cy="32" r="14" fill="#9aa3ad"/><circle cx="32" cy="32" r="6" fill="#fff"/></svg>`,
-  lang: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="${G}"/><text x="24" y="38" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">A</text><text x="42" y="42" text-anchor="middle" font-size="17" font-weight="700" fill="#fff">অ</text></svg>`,
-  user: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="#e8f7ee"/><circle cx="32" cy="25" r="10" fill="${G}"/><path d="M12 54c3-12 13-17 20-17s17 5 20 17z" fill="${G}"/></svg>`,
+  lang: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" style="fill:var(--g)"/><text x="24" y="38" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">A</text><text x="42" y="42" text-anchor="middle" font-size="17" font-weight="700" fill="#fff">অ</text></svg>`,
+  user: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" style="fill:var(--g50)"/><circle cx="32" cy="25" r="10" style="fill:var(--g)"/><path d="M12 54c3-12 13-17 20-17s17 5 20 17z" style="fill:var(--g)"/></svg>`,
   home: '<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   doc: '<svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6zm8 1.5V8h4.5M9 13h8M9 17h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
   gear: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
@@ -61,11 +72,9 @@ function methodList(p, r) {
     if (m.renewalMethod) rows.push([t('renewalMethod'), t(`rm_${m.renewalMethod}`)]);
   }
   if (p === 'tbsd') rows.push([t('mTbsdMode'), t(`tm_${m.interestMode}`)]);
-  rows.push([t('mDayCount'), t(m.dayCount === 'actual' ? 'dcActual' : 'dcMonthly')]);
   const tt = p === 'fdr' ? (m.renewalMethod === 'principal_interest' ? 'tt_maturity' : 'tt_each_term') : `tt_${m.taxTiming}`;
   rows.push([t('mTaxTiming'), t(tt)]);
   rows.push([t('mExciseBasis'), t(`eb_${m.exciseBasis}`)]);
-  rows.push([t('mRounding'), `${t(`rmode_${m.rounding.mode}`)} / ${t(`ru_${m.rounding.unit}`)}`]);
   return `<ul class="kv">${rows.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>`;
 }
 
@@ -85,16 +94,54 @@ const exciseCols = () => [
 const errorsHtml = (errs) => `<div class="card err"><ul>${errs.map((e) => `<li>${esc(t(`err_${e}`))}</li>`).join('')}</ul></div>`;
 
 /* ---------------- Home ---------------- */
-const verLine = () => `${t('version')} ${APP_VERSION} · ${t('build')} ${BUILD_ID} · ${BUILD_DATE}`;
 function viewHome() {
   const tile = (href, icon, label, sub, cls = '') => `<a href="${href}" class="tile ${cls}"><span class="ico">${ICONS[icon]}</span><span class="tt">${esc(label)}</span>${sub ? `<small>${esc(sub)}</small>` : ''}</a>`;
-  return `<div class="hero"><i class="orb o1"></i><i class="orb o2"></i><div class="seal">★</div><div class="brand"><div class="bn">পূবালী ব্যাংক পিএলসি</div><div class="en">PUBALI BANK PLC</div></div></div>
+  const hasName = profile.name.trim();
+  const line = [profile.designation, profile.branch].map((x) => x.trim()).filter(Boolean).join(' · ');
+  const title = hasName ? esc(profile.name) : t('profileSetup');
+  const sub = hasName || line ? esc(line || t('profileEdit')) : t('profileSetupSub');
+  const photo = profile.photo ? `<img src="${profile.photo}" alt="">` : ICONS.user;
+  return `<div class="hero light"><img class="brandlogo" src="img/logo-full.png" alt="Pubali Bank PLC"></div>
   <main class="home">
-    <section class="welcome"><div class="avatar">${ICONS.user}</div><div><h2>${esc(t('appTitle'))}</h2><p>${esc(t('appSubtitle'))}</p></div></section>
+    <a class="welcome" href="#/profile"><div class="avatar">${photo}</div><div class="wtxt"><h2>${title}</h2><p>${sub}</p></div><span class="edit">✎</span></a>
     <div class="grid">
       ${tile('#/dps', 'dps', t('dps'), t('dpsFull'), 'dps')}${tile('#/fdr', 'fdr', t('fdr'), t('fdrFull'), 'fdr')}
       ${tile('#/tbsd', 'tbsd', t('tbsd'), t('tbsdFull'), 'tbsd')}${tile(`#/details/${last || 'dps'}`, 'details', t('lastResult'), '', 'alt')}
-    </div>${estNote()}<p class="ver">${esc(verLine())}</p></main>${nav('home')}`;
+    </div></main>${nav('home')}`;
+}
+
+/* ---------------- Profile ---------------- */
+function viewProfile() {
+  const photo = profile.photo ? `<img src="${profile.photo}" alt="">` : ICONS.user;
+  const field = (k, label) => `<label class="fld"><span class="lbl">${t(label)}</span><input data-pf="${k}" value="${esc(profile[k])}" autocomplete="off"></label>`;
+  return `${topBar(t('profile'))}<main class="sheet pad">
+  <section class="card prof"><div class="pphoto">${photo}</div>
+    <div class="pbtns"><button class="btn" id="pchoose" type="button">${t(profile.photo ? 'pChange' : 'pChoose')}</button>${profile.photo ? `<button class="btn ghost danger" id="premove" type="button">${t('pRemove')}</button>` : ''}</div>
+    <input type="file" id="pfile" accept="image/*" hidden></section>
+  <section class="card">${field('name', 'pName')}${field('designation', 'pDesignation')}${field('branch', 'pBranch')}</section>
+  <p class="note center" id="psaved"></p></main>${nav('')}`;
+}
+function shrinkPhoto(file) { // centre-crop to a 256px square JPEG so it stays small in storage
+  return new Promise((resolve, reject) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const S = 256, c = document.createElement('canvas'); c.width = c.height = S;
+      const m = Math.min(img.width, img.height);
+      c.getContext('2d').drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S);
+      URL.revokeObjectURL(url); resolve(c.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = reject; img.src = url;
+  });
+}
+function bindProfile() {
+  const save = () => { store(PKEY, profile); const n = $('#psaved'); if (n) n.textContent = `✓ ${t('sSaved')}`; };
+  app.querySelectorAll('[data-pf]').forEach((el) => el.addEventListener('input', () => { profile[el.dataset.pf] = el.value; save(); }));
+  $('#pchoose').addEventListener('click', () => $('#pfile').click());
+  $('#pfile').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    try { profile.photo = await shrinkPhoto(f); save(); render(); } catch (err) { /* ignore unreadable image */ }
+  });
+  $('#premove')?.addEventListener('click', () => { profile.photo = ''; save(); render(); });
 }
 
 /* ---------------- Calculator ---------------- */
@@ -245,6 +292,7 @@ function statementHtml(p, r) {
   const eTotal = r.exciseRows.reduce((a, e) => a + e.duty, 0);
   return `<h1>পূবালী ব্যাংক পিএলসি / PUBALI BANK PLC</h1><h2>${t('statement')} — ${t(P.title)} (${t(P.full)})</h2>
   <p>${t('generatedOn')}: ${F.d(new Date().toISOString().slice(0, 10))}</p>
+  ${profile.name.trim() ? `<p>${t('preparedBy')}: ${esc([profile.name, profile.designation, profile.branch].map((x) => x.trim()).filter(Boolean).join(', '))}</p>` : ''}
   <h3>${t('inputs')}</h3>${inputsTable(p)}
   <h3>${t('maturityDetail')}</h3>${summaryTab(p, r)}
   <h3>${t(P.monthlyTab)}</h3>${table(P.monthlyCols(F, r), r[P.tableKey])}
@@ -283,10 +331,10 @@ function selInput(path, label, options, num) {
 }
 function viewSettings() {
   const cm = [[0, t('cmSimple')], [1, t('cmMonthly')], [3, t('cmQuarterly')], [6, t('cmHalf')], [12, t('cmYearly')]];
-  const dc = [['monthly', t('dcMonthly')], ['actual', t('dcActual')]];
   const slabs = cfg.excise.slabs.map((s, i) => `<div class="slab"><input data-slab="${i}" data-f="upTo" inputmode="numeric" placeholder="${t('sNoLimit')}" value="${s.upTo ?? ''}"><input data-slab="${i}" data-f="duty" inputmode="numeric" value="${s.duty}"><button type="button" class="x" data-del="${i}" aria-label="remove">×</button></div>`).join('');
   return `${topBar(t('settings'))}<main class="sheet pad">
-  <section class="card about"><h3>${t('sAbout')}</h3><ul class="kv"><li><span>${t('version')}</span><b>${APP_VERSION}</b></li><li><span>${t('build')}</span><b>${esc(BUILD_ID)}</b></li><li><span>${t('colDate')}</span><b>${BUILD_DATE}</b></li></ul></section>
+  <section class="card about"><h3>${t('sAbout')}</h3><ul class="kv"><li><span>${t('version')}</span><b>${APP_VERSION}</b></li></ul></section>
+  <section class="card"><h3>${t('sTheme')}</h3><div class="themes">${THEMES.map((k) => `<button type="button" class="swatch ${theme === k ? 'on' : ''}" data-theme="${k}"><i class="sw-${k}"></i><span>${t(`th_${k}`)}</span></button>`).join('')}</div></section>
   <section class="card"><h3>${t('sLanguage')}</h3><div class="seg">${[['en', 'langEn'], ['bn', 'langBn']].map(([c, k]) => `<button type="button" class="${L() === c ? 'on' : ''}" data-lang="${c}">${t(k)}</button>`).join('')}</div></section>
   <section class="card"><h3>${t('sRates')}</h3><p class="note">${t('sRatesNote')}</p>
     <h4>${t('dps')}</h4><div class="g3">${[3, 5, 7].map((y) => numInput(`rates.dps.${y}`, `${localizeDigits(y, L())} ${t('years')}`, '%')).join('')}</div>
@@ -296,13 +344,9 @@ function viewSettings() {
   <section class="card"><h3>${t('sExcise')}</h3><div class="slabhead"><span>${t('sUpTo')}</span><span>${t('sDuty')}</span></div><div id="slabs">${slabs}</div>
     <button type="button" class="btn ghost" id="addSlab">${t('sAddSlab')}</button></section>
   <section class="card"><h3>${t('sMethods')}</h3>
-    ${selInput('dps.compoundingMonths', t('sDpsCm'), cm, true)}${selInput('dps.dayCount', t('sDpsDc'), dc)}
-    ${selInput('fdr.compoundingMonths', t('sFdrCm'), cm.slice(1), true)}${selInput('fdr.dayCount', t('sFdrDc'), dc)}${selInput('tbsd.dayCount', t('sTbsdDc'), dc)}
+    ${selInput('dps.compoundingMonths', t('sDpsCm'), cm, true)}
     ${selInput('tbsd.interestMode', t('sTbsdMode'), [['compound', t('tm_compound')], ['payout', t('tm_payout')]])}
     ${selInput('excise.basis', t('sExBasis'), [['principal', t('eb_principal')], ['principal_plus_interest', t('eb_principal_plus_interest')]])}</section>
-  <section class="card"><h3>${t('sRounding')}</h3>
-    ${selInput('rounding.mode', t('sRoundMode'), ['half_up', 'floor', 'ceil', 'bankers'].map((m) => [m, t(`rmode_${m}`)]))}
-    ${selInput('rounding.unit', t('sRoundUnit'), [['paisa', t('ru_paisa')], ['taka', t('ru_taka')]])}</section>
   <section class="card"><h3>${t('sDefaults')}</h3>
     ${selInput('defaults.dpsYears', `${t('dps')} (${t('years')})`, [[3, '3'], [5, '5'], [7, '7']].map(([v, l]) => [v, localizeDigits(l, L())]), true)}
     ${selInput('defaults.fdrMonths', `${t('fdr')} (${t('months')})`, [1, 3, 6, 12].map((m) => [m, localizeDigits(m, L())]), true)}
@@ -338,6 +382,7 @@ function bindSettings() {
     const el = e.target.closest('button');
     if (!el) return;
     if (el.dataset.lang) { setLang(el.dataset.lang); render(); return; }
+    if (el.dataset.theme) { theme = el.dataset.theme; try { localStorage.setItem('pbdc.theme', theme); } catch (err) { /* ignore */ } applyTheme(); render(); return; }
     if (el.id === 'addSlab') { cfg.excise.slabs.push({ upTo: null, duty: 0 }); commit(); render(); }
     else if (el.dataset.del !== undefined) { cfg.excise.slabs.splice(Number(el.dataset.del), 1); commit(); render(); }
     else if (el.id === 'reset' && confirm(t('sConfirmReset'))) { cfg = resetConfig(); vals = {}; store(VKEY, vals); render(); }
@@ -354,7 +399,10 @@ function render() {
   if (PRODUCTS[page]) html = viewCalc(page);
   else if (page === 'details') html = viewDetails(PRODUCTS[a] ? a : last, b || 'summary');
   else if (page === 'settings') html = viewSettings();
+  else if (page === 'profile') html = viewProfile();
   else html = viewHome();
+  const isHome = !PRODUCTS[page] && !['details', 'settings', 'profile'].includes(page);
+  app.classList.toggle('is-home', isHome);
   app.innerHTML = html;
   document.title = `${t('appTitle')} | Pubali Bank`;
   if (PRODUCTS[page]) bindCalc(page);
@@ -363,8 +411,19 @@ function render() {
     $('#print')?.addEventListener('click', () => doPrint(p));
     $('#csv')?.addEventListener('click', () => doCsv(p));
   } else if (page === 'settings') bindSettings();
+  else if (page === 'profile') bindProfile();
   if (!(page === 'settings')) window.scrollTo(0, 0);
 }
+function showSplash() {
+  const d = document.createElement('div');
+  d.id = 'splash';
+  d.innerHTML = `<img src="img/logo.png" alt=""><h1>পূবালী ব্যাংক পিএলসি</h1><h2>PUBALI BANK PLC</h2><p>${esc(t('appTitle'))}</p><small>${t('version')} ${APP_VERSION}</small>`;
+  document.body.appendChild(d);
+  setTimeout(() => d.classList.add('out'), 1400);
+  setTimeout(() => d.remove(), 1900);
+}
 setLang(L());
+applyTheme();
 window.addEventListener('hashchange', render);
 render();
+showSplash();

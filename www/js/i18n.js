@@ -49,6 +49,10 @@ const en = {
   sTbsdTenures: 'TBSD tenure options (months, comma separated)', sReset: 'Reset to defaults', sSaved: 'Saved on this device',
   sDpsCm: 'DPS interest capitalisation', sDpsDc: 'DPS day count', sFdrCm: 'FDR default compounding', sFdrDc: 'FDR day count', sTbsdDc: 'TBSD day count', sExBasis: 'Excise duty balance basis',
   sConfirmReset: 'Reset all settings to defaults?',
+  // v4 additions
+  profile: 'Profile', profileSetup: 'Set up your profile', profileSetupSub: 'Add your name, designation, branch and photo', profileEdit: 'Tap to edit your profile',
+  pName: 'Name', pDesignation: 'Designation', pBranch: 'Branch Name', pChoose: 'Choose photo', pChange: 'Change photo', pRemove: 'Remove photo', preparedBy: 'Prepared by',
+  sTheme: 'Theme', th_green: 'Pubali Green', th_blue: 'Navy Blue', th_purple: 'Royal Purple', th_dark: 'Dark',
   // v3 additions
   version: 'Version', build: 'Build', sAbout: 'About this app', appSubtitle: 'See what you will actually receive after tax and duty',
   legPrincipal: 'Principal', legInterest: 'Net interest', legDeduction: 'Deductions', taxShort: 'Tax',
@@ -109,6 +113,10 @@ const bn = {
   sTbsdTenures: 'টিবিএসডি মেয়াদের বিকল্প (মাস, কমা দিয়ে)', sReset: 'ডিফল্টে ফিরুন', sSaved: 'এই ডিভাইসে সংরক্ষিত',
   sDpsCm: 'ডিপিএস সুদ যুক্ত হওয়ার ব্যবধান', sDpsDc: 'ডিপিএস দিন গণনা', sFdrCm: 'এফডিআর ডিফল্ট চক্রবৃদ্ধি', sFdrDc: 'এফডিআর দিন গণনা', sTbsdDc: 'টিবিএসডি দিন গণনা', sExBasis: 'আবগারি শুল্কের স্থিতির ভিত্তি',
   sConfirmReset: 'সব সেটিংস ডিফল্টে ফিরিয়ে নেবেন?',
+  // v4 additions
+  profile: 'প্রোফাইল', profileSetup: 'আপনার প্রোফাইল সেট করুন', profileSetupSub: 'নাম, পদবি, শাখার নাম ও ছবি যোগ করুন', profileEdit: 'প্রোফাইল বদলাতে ট্যাপ করুন',
+  pName: 'নাম', pDesignation: 'পদবি', pBranch: 'শাখার নাম', pChoose: 'ছবি বেছে নিন', pChange: 'ছবি বদলান', pRemove: 'ছবি সরান', preparedBy: 'প্রস্তুতকারক',
+  sTheme: 'থিম', th_green: 'পূবালী সবুজ', th_blue: 'নেভি ব্লু', th_purple: 'রয়্যাল পার্পল', th_dark: 'ডার্ক',
   // v3 additions
   version: 'সংস্করণ', build: 'বিল্ড', sAbout: 'অ্যাপ সম্পর্কে', appSubtitle: 'কর ও শুল্ক কাটার পর আসলে কত পাবেন, দেখুন',
   legPrincipal: 'আসল', legInterest: 'নিট সুদ', legDeduction: 'কর্তন', taxShort: 'কর',
